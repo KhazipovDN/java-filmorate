@@ -19,7 +19,7 @@ public class FilmController {
 
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Integer, Film> films = new HashMap<>();
-    int id=0;
+    int id = 0;
 
     @PostMapping("/films")
     public ResponseEntity<Film> createFilm(@RequestBody Film film) throws ValidationException {
@@ -39,8 +39,7 @@ public class FilmController {
             films.put(id,updatedFilm);
             log.info("Фильм обновлен", updatedFilm);
             return new ResponseEntity<>(updatedFilm, HttpStatus.OK);
-        }
-        else {
+        } else {
             return new ResponseEntity<>(updatedFilm, HttpStatus.NOT_FOUND);
         }
     }
