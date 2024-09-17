@@ -19,7 +19,7 @@ public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Integer, User> users = new HashMap<>();
-    int id=0;
+    int id = 0;
 
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@RequestBody User user) throws ValidationException {
@@ -39,8 +39,7 @@ public class UserController {
             users.put(id, updatedUser);
             log.info("Пользователь создан", updatedUser);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-        }
-        else {
+        } else {
             return new ResponseEntity<>(updatedUser, HttpStatus.NOT_FOUND);
         }
     }
