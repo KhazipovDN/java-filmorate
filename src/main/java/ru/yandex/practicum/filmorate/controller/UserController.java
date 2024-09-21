@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,12 +23,12 @@ public class UserController {
     int id = 0;
 
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody User user) throws ValidationException {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws ValidationException {
         id++;
         log.info("Создание нового пользователя", user);
         user.setId(id);
         users.put(id,user);
-        log.info("Фильм создан", user);
+        log.info("Пользователь создан", user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 

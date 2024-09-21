@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,7 +23,7 @@ public class FilmController {
     int id = 0;
 
     @PostMapping("/films")
-    public ResponseEntity<Film> createFilm(@RequestBody Film film) throws ValidationException {
+    public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Создание нового фильма", film);
         id++;
         film.setId(id);
