@@ -37,6 +37,7 @@ public class UserController {
         if (users.containsKey(id)) {
             log.info("Обновление нового пользователя", updatedUser);
             users.remove(id);
+            updatedUser.setId(id);
             users.put(id, updatedUser);
             log.info("Пользователь создан", updatedUser);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);

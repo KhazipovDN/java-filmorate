@@ -37,6 +37,7 @@ public class FilmController {
         if (films.containsKey(id)) {
             log.info("Обновление фильма", updatedFilm);
             films.remove(id);
+            updatedFilm.setId(id);
             films.put(id,updatedFilm);
             log.info("Фильм обновлен", updatedFilm);
             return new ResponseEntity<>(updatedFilm, HttpStatus.OK);
