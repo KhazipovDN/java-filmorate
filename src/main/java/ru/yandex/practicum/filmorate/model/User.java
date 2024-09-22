@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +23,7 @@ public class User {
     @Pattern(regexp = "^\\S+$", message = "Логин не может содержать пробелы")
     private String login;
 
-    private String name;
+    private String name = "";
 
     @NotNull(message = "Дата рождения обязательна")
     @Past(message = "Дата рождения не может быть в будущем")
