@@ -18,7 +18,8 @@ import java.time.LocalDate;
 public class Film {
     private int id;
 
-    @NotNull(message = "Название фильма не может быть пустым")
+    //@NotNull(message = "Название фильма не может быть пустым")
+    @Size(min = 1, message = "Название фильма не может быть пустым")
     private String name;
 
     @Size(max = 200, message = "Описание фильма не может быть длиннее 200 символов")
