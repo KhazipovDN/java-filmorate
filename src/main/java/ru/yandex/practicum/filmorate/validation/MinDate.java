@@ -16,6 +16,5 @@ public @interface MinDate {
 
     Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default
-            {};
+    Class<? extends Payload>[] payload() default {};
 }
