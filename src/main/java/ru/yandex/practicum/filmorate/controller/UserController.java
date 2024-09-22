@@ -15,25 +15,32 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/users")
 public class UserController {
 
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Integer, User> users = new HashMap<>();
     int id = 0;
 
-    @PostMapping("/users")
+    @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws ValidationException {
         id++;
         log.info("Создание нового пользователя", user);
         user.setId(id);
+        if (user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
         users.put(id,user);
         log.info("Пользователь создан", user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
-    @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable int id, @RequestBody User updatedUser) throws ValidationException {
+    @PutMapping
+    public ResponseEntity<User> updateUser(@RequestBody User updatedUser) throws ValidationException {
+        Integer id = updatedUser.getId();
+        if (id == null) {
+            return new ResponseEntity<>(updatedUser, HttpStatus.BAD_REQUEST);
+        }
         if (users.containsKey(id)) {
             log.info("Обновление нового пользователя", updatedUser);
             users.remove(id);
@@ -46,7 +53,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public List<User> getAllUsers() {
         return new ArrayList<>(users.values());
     }

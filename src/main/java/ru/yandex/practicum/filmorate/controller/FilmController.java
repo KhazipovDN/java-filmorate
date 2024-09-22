@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/films")
 public class FilmController {
 
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final Map<Integer, Film> films = new HashMap<>();
     int id = 0;
 
-    @PostMapping("/films")
+    @PostMapping
     public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Создание нового фильма", film);
         id++;
@@ -32,8 +32,13 @@ public class FilmController {
         return new ResponseEntity<>(film, HttpStatus.CREATED);
     }
 
-    @PutMapping("/films/{id}")
-    public ResponseEntity<Film> updateFilm(@PathVariable int id, @RequestBody Film updatedFilm) throws ValidationException {
+    @PutMapping
+    public ResponseEntity<Film> updateFilm(@RequestBody Film updatedFilm) throws ValidationException {
+       Integer id = updatedFilm.getId();
+
+        if (id == null) {
+            return new ResponseEntity<>(updatedFilm, HttpStatus.BAD_REQUEST);
+        }
         if (films.containsKey(id)) {
             log.info("Обновление фильма", updatedFilm);
             films.remove(id);
@@ -46,7 +51,7 @@ public class FilmController {
         }
     }
 
-    @GetMapping("/films")
+    @GetMapping
     public List<Film> getAllFilms() {
         return new ArrayList<>(films.values());
     }
