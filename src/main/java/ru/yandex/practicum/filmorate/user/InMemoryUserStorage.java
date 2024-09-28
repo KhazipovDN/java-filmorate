@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
