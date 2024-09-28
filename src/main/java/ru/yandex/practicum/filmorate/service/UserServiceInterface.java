@@ -11,5 +11,5 @@ public interface UserServiceInterface {
 
     List<Integer> getMutualFriends(Integer userId, Integer friendId);
 
-    User getUserById (Integer userId);
+    User getUserById(Integer userId);
 }
