@@ -40,7 +40,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public List<Integer> getMutualFriends(Integer userId, Integer friendId) {
-        List <Integer> mutualFriends = new ArrayList<>();
+        List<Integer> mutualFriends = new ArrayList<>();
         User user = userStorage.getAllUsers().get(userId);
         User friend = userStorage.getAllUsers().get(friendId);
         if (user == null || friend == null) {
