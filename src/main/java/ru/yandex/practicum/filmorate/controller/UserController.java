@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.myException.ValidationException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -49,7 +50,7 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public Set<Integer> getFriends(@PathVariable Integer id) {
-        if (!userStorage.getAllUsers().contains(id))
+        if (!userStorage.getAllUsers().containsKey(id))
             throw new ResourceNotFoundException("Пользователь не найден");
         return userStorage.getAllUsers().get(id).getFriends();
     }
@@ -81,7 +82,7 @@ public class UserController {
 
     @GetMapping
     public List<User> getAllUsers() {
-        return userStorage.getAllUsers();
+        return new ArrayList<>(userStorage.getAllUsers().values());
     }
 
 }

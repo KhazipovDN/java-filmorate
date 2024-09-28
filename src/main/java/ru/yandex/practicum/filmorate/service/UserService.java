@@ -55,7 +55,7 @@ public class UserService implements UserServiceInterface {
 
     @Override
     public User getUserById(Integer userId) {
-        if (!userStorage.getAllUsers().contains(userId))
+        if (!userStorage.getAllUsers().containsKey(userId))
             throw new ResourceNotFoundException("Пользователь не найден");
         return userStorage.getAllUsers().get(userId);
     }

@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.myException.ValidationException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -53,7 +54,7 @@ public class FilmController {
 
     @GetMapping
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        return new ArrayList<>(filmStorage.getAllFilms().values());
     }
 
     @PutMapping("/{id}/like/{userId}")

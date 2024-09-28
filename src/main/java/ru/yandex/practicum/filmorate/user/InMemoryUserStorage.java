@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -37,8 +36,13 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+    public Map<Integer, User> getAllUsers() {
+        return users;
+    }
+
+    @Override
+    public User getUserById(Integer id) {
+        return users.get(id);
     }
 
     @Override

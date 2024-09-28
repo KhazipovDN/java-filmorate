@@ -51,7 +51,7 @@ public class FilmService implements FilmServiceInterface {
 
     @Override
     public List<Film> getTopFilms(Integer count) {
-        List<Film> allFilms = new ArrayList<>(filmStorage.getAllFilms());
+        List<Film> allFilms = new ArrayList<>(filmStorage.getAllFilms().values());
         allFilms.sort(Comparator.comparingInt(film -> -film.getLiked().size()));
         if (count == null) {
             count = 10;
@@ -63,7 +63,7 @@ public class FilmService implements FilmServiceInterface {
 
     @Override
     public Film getFilmById(Integer filmId) {
-        if (!filmStorage.getAllFilms().contains(filmId))
+        if (!filmStorage.getAllFilms().containsKey(filmId))
             throw new ResourceNotFoundException("Фильм не найден");
         return filmStorage.getAllFilms().get(filmId);
     }
