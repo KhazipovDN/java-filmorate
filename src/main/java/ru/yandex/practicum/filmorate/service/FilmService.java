@@ -26,7 +26,7 @@ public class FilmService implements FilmServiceInterface {
         Film film = filmStorage.getAllFilms().get(filmId);
         User user = userStorage.getAllUsers().get(userId);
         if (film == null || user == null) {
-            throw new ResourceNotFoundException("Фильм или пользователь не найден");
+            throw new InternalServerErrorException("Фильм или пользователь не найден");
         }
         if (film.getLiked().contains(userId)) {
             throw new InternalServerErrorException("Пользователь уже поставил лайк этому фильму");

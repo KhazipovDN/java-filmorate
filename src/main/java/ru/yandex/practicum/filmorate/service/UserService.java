@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.myException.InternalServerErrorException;
 import ru.yandex.practicum.filmorate.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
@@ -19,7 +20,7 @@ public class UserService implements UserServiceInterface {
         User user = userStorage.getAllUsers().get(userId);
         User friend = userStorage.getAllUsers().get(friendId);
         if (user == null || friend == null) {
-            throw new ResourceNotFoundException("Пользователь(и) не найден");
+            throw new InternalServerErrorException("Пользователь(и) не найден");
         }
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
@@ -30,7 +31,7 @@ public class UserService implements UserServiceInterface {
         User user = userStorage.getAllUsers().get(userId);
         User friend = userStorage.getAllUsers().get(friendId);
         if (user == null || friend == null) {
-            throw new ResourceNotFoundException("Пользователь(и) не найден");
+            throw new InternalServerErrorException("Пользователь(и) не найден");
         }
         if (user.getFriends().contains(friendId)) {
             user.getFriends().remove(friendId);
@@ -44,7 +45,7 @@ public class UserService implements UserServiceInterface {
         User user = userStorage.getAllUsers().get(userId);
         User friend = userStorage.getAllUsers().get(friendId);
         if (user == null || friend == null) {
-            throw new ResourceNotFoundException("Пользователь(и) не найден");
+            throw new InternalServerErrorException("Пользователь(и) не найден");
         }
         for (Integer mutualfriendId : user.getFriends()) {
             if (friend.getFriends().contains(mutualfriendId))
