@@ -5,7 +5,10 @@ import java.util.List;
 
 public interface UserStorage {
     void createUser(User user);
+
     void updateUser(User user);
-    public List<User> getAllUsers();
+
+    List<User> getAllUsers();
+
     Boolean findById (User user);
 }

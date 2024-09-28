@@ -5,7 +5,10 @@ import java.util.List;
 
 public interface FilmStorage {
     void createFilm(Film film);
+
     void updateFilm(Film film);
-    public List<Film> getAllFilms();
+
+    List<Film> getAllFilms();
+
     Boolean findById (Film film);
 }
