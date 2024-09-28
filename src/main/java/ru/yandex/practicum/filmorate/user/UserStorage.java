@@ -1,4 +1,4 @@
-package ru.yandex.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.user;
 
 import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;

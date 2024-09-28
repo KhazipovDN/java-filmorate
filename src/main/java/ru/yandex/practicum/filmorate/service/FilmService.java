@@ -1,9 +1,9 @@
-package ru.yandex.filmorate.storage.service;
+package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.filmorate.storage.film.FilmStorage;
-import ru.yandex.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.film.FilmStorage;
+import ru.yandex.practicum.filmorate.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.InternalServerErrorException;
