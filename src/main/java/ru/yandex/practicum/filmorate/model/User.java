@@ -8,11 +8,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
 public class User {
     private int id;
+    private Set<Integer> friends = new HashSet<>();
 
     @NotNull(message = "Email не может быть пустым")
     @Email(message = "Некорректный формат email")
