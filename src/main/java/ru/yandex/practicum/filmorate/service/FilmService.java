@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService implements FilmServiceInterface {
 
-    @Autowired(required=true)
+    @Autowired(required = true)
     private FilmStorage filmStorage;
-    @Autowired(required=true)
+    @Autowired(required = true)
     private UserStorage userStorage;
 
 
