@@ -8,10 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.myException.InternalServerErrorException;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.user.UserStorage;
+import ru.yandex.practicum.filmorate.service.UserServiceImpl;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.myException.ValidationException;
 
 import java.util.ArrayList;
@@ -22,58 +20,53 @@ import java.util.Set;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService userService;
-    private final UserStorage userStorage;
+    @Autowired
+    private UserServiceImpl userServiceImpl;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
-    @Autowired
-    public UserController(UserService userService, UserStorage userStorage) {
-        this.userService = userService;
-        this.userStorage = userStorage;
-    }
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable Integer id) {
-        return userService.getUserById(id);
+        return userServiceImpl.getUserById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public ResponseEntity<Void> addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
-        userService.addFriend(id, friendId);
+        userServiceImpl.addFriend(id, friendId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public ResponseEntity<Void> removeFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
-        userService.removeFriend(id, friendId);
+        userServiceImpl.removeFriend(id, friendId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{id}/friends")
-    public Set<Integer> getFriends(@PathVariable Integer id) {
-        if (!userStorage.getAllUsers().containsKey(id))
+    public Set<User> getFriends(@PathVariable Integer id) {
+        if (!userServiceImpl.getAllUsers().containsKey(id))
             throw new InternalServerErrorException("Пользователь не найден");
-        return userStorage.getAllUsers().get(id).getFriends();
+        return userServiceImpl.getUserFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<Integer> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
-        return userService.getMutualFriends(id, otherId);
+    public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
+        return userServiceImpl.getMutualFriends(id, otherId);
     }
 
     @PostMapping
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws ValidationException {
         log.info("Создание нового пользователя", user);
-        userStorage.createUser(user);
+        userServiceImpl.createUser(user);
         log.info("Пользователь создан", user);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<User> updateUser(@Valid @RequestBody User updatedUser) throws ValidationException {
-        if (userStorage.findById(updatedUser)) {
+        if (userServiceImpl.findById(updatedUser)) {
             log.info("Обновление нового пользователя", updatedUser);
-            userStorage.updateUser(updatedUser);
+            userServiceImpl.updateUser(updatedUser);
             log.info("Пользователь создан", updatedUser);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
         } else {
@@ -83,7 +76,7 @@ public class UserController {
 
     @GetMapping
     public List<User> getAllUsers() {
-        return new ArrayList<>(userStorage.getAllUsers().values());
+        return new ArrayList<>(userServiceImpl.getAllUsers().values());
     }
 
 }

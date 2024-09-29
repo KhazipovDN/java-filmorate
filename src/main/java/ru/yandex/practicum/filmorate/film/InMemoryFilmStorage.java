@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.film;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.myException.InternalServerErrorException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,9 +21,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public void updateFilm(Film film) {
-        if (!films.containsKey(id)) {
-            throw new InternalServerErrorException("Фильм не найден123");
-        }
         films.remove(id);
         film.setId(id);
         films.put(id,film);
