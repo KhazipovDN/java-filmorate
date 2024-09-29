@@ -40,7 +40,7 @@ public class FilmService implements FilmServiceInterface {
         Film film = filmStorage.getAllFilms().get(filmId);
         User user = userStorage.getAllUsers().get(userId);
         if (film == null || user == null) {
-            throw new ResourceNotFoundException("Фильм или пользователь не найден");
+            throw new InternalServerErrorException("Фильм или пользователь не найден");
         }
         if (film.getLiked().contains(userId)) {
             film.getLiked().remove(userId);
@@ -64,7 +64,7 @@ public class FilmService implements FilmServiceInterface {
     @Override
     public Film getFilmById(Integer filmId) {
         if (!filmStorage.getAllFilms().containsKey(filmId))
-            throw new ResourceNotFoundException("Фильм не найден");
+            throw new InternalServerErrorException("Фильм не найден");
         return filmStorage.getAllFilms().get(filmId);
     }
 }

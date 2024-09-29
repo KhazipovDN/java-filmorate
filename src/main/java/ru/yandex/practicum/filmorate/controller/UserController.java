@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.myException.InternalServerErrorException;
 import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
@@ -51,7 +52,7 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public Set<Integer> getFriends(@PathVariable Integer id) {
         if (!userStorage.getAllUsers().containsKey(id))
-            throw new ResourceNotFoundException("Пользователь не найден");
+            throw new InternalServerErrorException("Пользователь не найден");
         return userStorage.getAllUsers().get(id).getFriends();
     }
 

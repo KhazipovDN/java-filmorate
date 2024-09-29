@@ -20,7 +20,7 @@ public class UserService implements UserServiceInterface {
         User user = userStorage.getAllUsers().get(userId);
         User friend = userStorage.getAllUsers().get(friendId);
         if (user == null || friend == null) {
-            throw new InternalServerErrorException("Пользователь(и) не найден");
+            throw new InternalServerErrorException("Пользователь(и) не найден(ы)");
         }
         user.getFriends().add(friendId);
         friend.getFriends().add(userId);
