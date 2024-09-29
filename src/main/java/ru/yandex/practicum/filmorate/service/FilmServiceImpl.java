@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.myException.InternalServerErrorException;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmServiceImpl implements FilmService {
