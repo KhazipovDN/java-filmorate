@@ -53,13 +53,20 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getTopFilms(Integer count) {
         List<Film> allFilms = new ArrayList<>(filmStorage.getAllFilms().values());
-        allFilms.sort(Comparator.comparingInt(film -> -film.getLiked().size()));
-        if (count == null) {
-            count = 10;
+        System.out.println(allFilms.isEmpty());
+        if (!allFilms.isEmpty()) {
+            allFilms.sort(Comparator.comparingInt(film -> -film.getLiked().size()));
+            if (count == null) {
+                count = 10;
+            }
+            List<Film> topFilms = new ArrayList<>();
+            for (int i = 0; i < count && i < allFilms.size(); i++) {
+                topFilms.add(allFilms.get(i));
+            }
+            return topFilms;
+        } else {
+            return Collections.emptyList();
         }
-        return allFilms.stream()
-                .limit(count)
-                .collect(Collectors.toList());
     }
 
     @Override

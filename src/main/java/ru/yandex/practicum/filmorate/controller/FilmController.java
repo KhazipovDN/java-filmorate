@@ -45,7 +45,7 @@ public class FilmController {
             log.info("Фильм обновлен", updatedFilm);
             return new ResponseEntity<>(updatedFilm, HttpStatus.OK);
         } else {
-            throw new ResourceNotFoundException("Фильм не найден");
+            throw new ResourceNotFoundException("Фильм не найден123");
         }
     }
 
