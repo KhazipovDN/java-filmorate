@@ -24,10 +24,10 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void updateUser(User user) {
-        if (!users.containsValue(user)) {
+        Integer id = user.getId();
+        if (users.get(id) == null) {
             throw new ResourceNotFoundException("Пользователь не найден");
         }
-        Integer id = user.getId();
         users.remove(id);
         user.setId(id);
         users.put(id, user);

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.myException.InternalServerErrorException;
+import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.service.UserServiceImpl;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.ValidationException;
@@ -44,8 +45,8 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public Set<User> getFriends(@PathVariable Integer id) {
-        if (!userServiceImpl.getAllUsers().containsKey(id))
-            throw new InternalServerErrorException("Пользователь не найден");
+        if (userServiceImpl.getUserById(id) == null)
+            throw new ResourceNotFoundException("Пользователь не найден");
         return userServiceImpl.getUserFriends(id);
     }
 
