@@ -22,7 +22,7 @@ public class FilmServiceImpl implements FilmService {
 
 
     @Override
-    public void likeFilm(Integer userId, Integer filmId) {
+    public void likeFilm(Integer filmId, Integer userId) {
         Film film = filmStorage.getAllFilms().get(filmId);
         User user = userStorage.getAllUsers().get(userId);
         if (film == null || user == null) {
@@ -36,7 +36,7 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public void unlikeFilm(Integer userId, Integer filmId) {
+    public void unlikeFilm(Integer filmId, Integer userId) {
         Film film = filmStorage.getAllFilms().get(filmId);
         User user = userStorage.getAllUsers().get(userId);
         if (film == null || user == null) {
