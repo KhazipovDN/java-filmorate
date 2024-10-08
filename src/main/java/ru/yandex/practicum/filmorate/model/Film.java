@@ -9,6 +9,8 @@ import lombok.Setter;
 import ru.yandex.practicum.filmorate.validation.MinDate;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Film.
@@ -17,6 +19,7 @@ import java.time.LocalDate;
 @Setter
 public class Film {
     private int id;
+    private Set<Integer> liked = new HashSet<>();
 
     //@NotNull(message = "Название фильма не может быть пустым")
     @Size(min = 1, message = "Название фильма не может быть пустым")
