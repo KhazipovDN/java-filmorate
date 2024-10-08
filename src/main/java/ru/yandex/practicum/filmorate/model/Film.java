@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import ru.yandex.practicum.filmorate.myenum.Genre;
+import ru.yandex.practicum.filmorate.myenum.MPARating;
 import ru.yandex.practicum.filmorate.validation.MinDate;
 
 import java.time.LocalDate;
@@ -21,7 +23,6 @@ public class Film {
     private int id;
     private Set<Integer> liked = new HashSet<>();
 
-    //@NotNull(message = "Название фильма не может быть пустым")
     @Size(min = 1, message = "Название фильма не может быть пустым")
     private String name;
 
@@ -32,6 +33,12 @@ public class Film {
     @Past(message = "Дата релиза не может быть в будущем")
     @MinDate
     private LocalDate releaseDate;
+
+    @NotNull(message = "Жанр должен быть заполнен")
+    private Genre genre;
+
+    @NotNull(message = "Райтинг фильма должен быть заполнен")
+    private MPARating rating;
 
     @Positive(message = "Продолжительность фильма должна быть положительной")
     private int duration;
