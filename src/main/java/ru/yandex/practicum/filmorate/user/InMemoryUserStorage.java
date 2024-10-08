@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.user;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
+import ru.yandex.practicum.filmorate.myenum.Friendship;
 
 import java.util.*;
 
@@ -56,7 +57,8 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Set<User> getUserFriends(Integer id) {
         Set<User> friends = new HashSet<>();
-        for (Integer friendId : getUserById(id).getFriends()) {
+        for (Integer friendId : getUserById(id).getFriendshipMap().keySet()) {
+            if (getUserById(id).getFriendshipMap().get(friendId) == Friendship.ACCEPTED)
             friends.add(getUserById(friendId));
         }
         return friends;

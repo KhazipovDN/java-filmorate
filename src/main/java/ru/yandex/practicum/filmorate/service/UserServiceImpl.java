@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.myException.ValidationException;
+import ru.yandex.practicum.filmorate.myenum.Friendship;
 import ru.yandex.practicum.filmorate.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
@@ -21,8 +23,17 @@ public class UserServiceImpl implements UserService {
         if (user == null || friend == null) {
             throw new ResourceNotFoundException("Пользователь(и) не найден(ы)");
         }
-        user.getFriends().add(friendId);
-        friend.getFriends().add(userId);
+        if (!user.getFriendshipMap().containsKey(friendId)) {
+            if (!friend.getFriendshipMap().containsKey(userId)) {
+                user.getFriendshipMap().put(friendId, Friendship.PENDING);
+            } else {
+                user.getFriendshipMap().put(friendId, Friendship.ACCEPTED);
+                friend.getFriendshipMap().remove(userId);
+                friend.getFriendshipMap().put(userId, Friendship.ACCEPTED);
+            }
+        } else {
+            throw new ValidationException("Вы уже отправили заявку/добавили в друзья");
+        }
     }
 
     @Override
@@ -32,9 +43,9 @@ public class UserServiceImpl implements UserService {
         if (user == null || friend == null) {
             throw new ResourceNotFoundException("Пользователь(и) не найден");
         }
-        if (user.getFriends().contains(friendId)) {
-            user.getFriends().remove(friendId);
-            friend.getFriends().remove(userId);
+        if (user.getFriendshipMap().containsKey(friendId)) {
+            user.getFriendshipMap().remove(friendId);
+            friend.getFriendshipMap().remove(userId);
         }
     }
 
@@ -46,8 +57,10 @@ public class UserServiceImpl implements UserService {
         if (user == null || friend == null) {
             throw new ResourceNotFoundException("Пользователь(и) не найден");
         }
-        for (Integer mutualfriendId : user.getFriends()) {
-            if (friend.getFriends().contains(mutualfriendId))
+        for (Integer mutualfriendId : user.getFriendshipMap().keySet()) {
+            if (friend.getFriendshipMap().containsKey(mutualfriendId) &&
+                    (friend.getFriendshipMap().get(mutualfriendId) == Friendship.ACCEPTED) &&
+                    user.getFriendshipMap().get(mutualfriendId) == Friendship.ACCEPTED)
                 mutualFriends.add(getUserById(mutualfriendId));
         }
         return mutualFriends;
