@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.film.FilmStorage;
 import ru.yandex.practicum.filmorate.myException.ValidationException;
@@ -16,8 +17,10 @@ import java.util.*;
 public class FilmServiceImpl implements FilmService {
 
     @Autowired
+    @Qualifier("filmDbStorage")
     private FilmStorage filmStorage;
     @Autowired
+    @Qualifier("userDbStorage")
     private UserStorage userStorage;
 
 
@@ -95,5 +98,6 @@ public class FilmServiceImpl implements FilmService {
             return filmStorage.findById(film);
 
     }
+
 
 }

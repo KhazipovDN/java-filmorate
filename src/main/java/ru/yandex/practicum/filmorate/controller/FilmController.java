@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import ru.yandex.practicum.filmorate.service.FilmServiceImpl;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
@@ -14,6 +15,7 @@ import ru.yandex.practicum.filmorate.myException.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
@@ -69,5 +71,35 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopularMovies(@RequestParam(value = "count", required = false) Integer count) {
         return filmServiceImpl.getTopFilms(count);
+    }
+
+    @GetMapping("/genres")
+    public List<Map<String, Object>> getAllGenres() {
+        List<Map<String, Object>> genresList = new ArrayList<>();
+        List<Map<String, Object>> genres = filmServiceImpl.getAllGenres();
+        for (Map<String, Object> genre : genres) {
+            genresList.add(genre);
+        }
+        return genresList;
+    }
+
+    @GetMapping("/genres/{id}")
+    public Map<String, Object> getGenreById(@PathVariable int id) throws ResourceNotFoundException {
+        return filmServiceImpl.getGenreById(id);
+    }
+
+    @GetMapping("/mpa")
+    public List<Map<String, Object>> getAllMpaRatings() {
+        List<Map<String, Object>> mpaRatingsList = new ArrayList<>();
+        List<Map<String, Object>> mpaRatings = filmServiceImpl.getAllMpaRatings();
+        for (Map<String, Object> rating : mpaRatings) {
+            mpaRatingsList.add(rating);
+        }
+        return mpaRatingsList;
+    }
+
+    @GetMapping("/mpa/{id}")
+    public Map<String, Object> getMpaRatingById(@PathVariable int id) throws ResourceNotFoundException {
+        return filmServiceImpl.getMpaRatingById(id);
     }
 }

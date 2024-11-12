@@ -34,10 +34,7 @@ public class Film {
     @MinDate
     private LocalDate releaseDate;
 
-    @NotNull(message = "Жанр должен быть заполнен")
     private Genre genre;
-
-    @NotNull(message = "Райтинг фильма должен быть заполнен")
     private MPARating rating;
 
     @Positive(message = "Продолжительность фильма должна быть положительной")

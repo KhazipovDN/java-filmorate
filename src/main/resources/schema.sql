@@ -1,0 +1,44 @@
+CREATE TABLE IF NOT EXISTS films (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    releaseDate DATE,
+    genreId INTEGER,
+    ratingId INTEGER,
+    duration INTEGER
+);
+
+CREATE TABLE IF NOT EXISTS genres (
+    genreId BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS ratings (
+    ratingId BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    login VARCHAR(255) NOT NULL,
+    birthday DATE
+);
+
+CREATE TABLE IF NOT EXISTS likes (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    filmId INTEGER,
+    userId INTEGER,
+    FOREIGN KEY (filmId) REFERENCES films(id),
+    FOREIGN KEY (userId) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS friendship (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    userId INTEGER,
+    friendId INTEGER,
+    status VARCHAR(50),
+    FOREIGN KEY (userId) REFERENCES users(id),
+    FOREIGN KEY (friendId) REFERENCES users(id)
+);

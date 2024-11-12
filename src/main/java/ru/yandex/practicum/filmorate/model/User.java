@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import ru.yandex.practicum.filmorate.myenum.Friendship;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 @Getter
 @Setter
+@ToString
 public class User {
     private int id;
 

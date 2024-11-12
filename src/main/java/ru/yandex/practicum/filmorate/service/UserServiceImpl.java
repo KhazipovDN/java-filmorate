@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.myException.ValidationException;
 import ru.yandex.practicum.filmorate.myenum.Friendship;
@@ -14,6 +15,7 @@ import java.util.*;
 public class UserServiceImpl implements UserService {
 
     @Autowired
+    @Qualifier("userDbStorage")
     private UserStorage userStorage;
 
     @Override
@@ -23,16 +25,17 @@ public class UserServiceImpl implements UserService {
         if (user == null || friend == null) {
             throw new ResourceNotFoundException("Пользователь(и) не найден(ы)");
         }
-        if (!user.getFriendshipMap().containsKey(friendId)) {
-            if (!friend.getFriendshipMap().containsKey(userId)) {
-                user.getFriendshipMap().put(friendId, Friendship.PENDING);
-            } else {
-                user.getFriendshipMap().put(friendId, Friendship.ACCEPTED);
-                friend.getFriendshipMap().remove(userId);
-                friend.getFriendshipMap().put(userId, Friendship.ACCEPTED);
-            }
-        } else {
-            throw new ValidationException("Вы уже отправили заявку/добавили в друзья");
+        switch (userStorage.checkFriendship(userId, friendId)) {
+            case 1:
+                throw new ValidationException("Вы уже отправили заявку/добавили в друзья");
+            case 2:
+                userStorage.updateFriendship(friendId, userId);
+                break;
+            case 3:
+                throw new ValidationException("Вы уже добавили в друзья");
+            case 0:
+                userStorage.createFriendship(userId, friendId);
+                break;
         }
     }
 
@@ -43,10 +46,10 @@ public class UserServiceImpl implements UserService {
         if (user == null || friend == null) {
             throw new ResourceNotFoundException("Пользователь(и) не найден");
         }
-        if (user.getFriendshipMap().containsKey(friendId)) {
-            user.getFriendshipMap().remove(friendId);
-            friend.getFriendshipMap().remove(userId);
+        if (userStorage.checkFriendshipStatus(userId, friendId)) {
+            throw new ValidationException("Дружба не существует");
         }
+        userStorage.deleteFriendship(userId, friendId);
     }
 
     @Override
