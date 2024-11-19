@@ -4,10 +4,13 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.FilmServiceImpl;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
@@ -15,23 +18,21 @@ import ru.yandex.practicum.filmorate.myException.ValidationException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
-@RequestMapping("/films")
 public class FilmController {
 
     @Autowired
     private FilmServiceImpl filmServiceImpl;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
-
-    @GetMapping("/{id}")
+    //
+    @GetMapping("/films/{id}")
     public Film getFilm(@PathVariable Integer id) throws ResourceNotFoundException {
         return filmServiceImpl.getFilmById(id);
     }
 
-    @PostMapping
+    @PostMapping("/films")
     public ResponseEntity<Film> createFilm(@Valid @RequestBody Film film) throws ValidationException {
         log.info("Создание нового фильма", film);
         filmServiceImpl.createFilm(film);
@@ -39,7 +40,7 @@ public class FilmController {
         return new ResponseEntity<>(film, HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping("/films")
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film updatedFilm) throws ValidationException {
         if (filmServiceImpl.findById(updatedFilm)) {
             log.info("Обновление фильма", updatedFilm);
@@ -51,55 +52,47 @@ public class FilmController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/films")
     public List<Film> getAllFilms() {
         return new ArrayList<>(filmServiceImpl.getAllFilms().values());
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping("/films/{id}/like/{userId}")
     public ResponseEntity<Void> addLike(@PathVariable Integer id, @PathVariable Integer userId)  {
         filmServiceImpl.likeFilm(id, userId);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping("/films/{id}/like/{userId}")
     public ResponseEntity<Void> unlikeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
         filmServiceImpl.unlikeFilm(id, userId);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/popular")
+    @GetMapping("/films/popular")
     public List<Film> getPopularMovies(@RequestParam(value = "count", required = false) Integer count) {
         return filmServiceImpl.getTopFilms(count);
     }
 
     @GetMapping("/genres")
-    public List<Map<String, Object>> getAllGenres() {
-        List<Map<String, Object>> genresList = new ArrayList<>();
-        List<Map<String, Object>> genres = filmServiceImpl.getAllGenres();
-        for (Map<String, Object> genre : genres) {
-            genresList.add(genre);
-        }
-        return genresList;
+    public List<Genre> getAllGenres() {
+        return filmServiceImpl.getAllGenres();
     }
 
     @GetMapping("/genres/{id}")
-    public Map<String, Object> getGenreById(@PathVariable int id) throws ResourceNotFoundException {
+    public Genre getGenresById(@PathVariable Integer id) {
         return filmServiceImpl.getGenreById(id);
     }
 
     @GetMapping("/mpa")
-    public List<Map<String, Object>> getAllMpaRatings() {
-        List<Map<String, Object>> mpaRatingsList = new ArrayList<>();
-        List<Map<String, Object>> mpaRatings = filmServiceImpl.getAllMpaRatings();
-        for (Map<String, Object> rating : mpaRatings) {
-            mpaRatingsList.add(rating);
-        }
-        return mpaRatingsList;
+    public List<MPA> getAllRatings() {
+        return filmServiceImpl.getAllRatings();
     }
 
     @GetMapping("/mpa/{id}")
-    public Map<String, Object> getMpaRatingById(@PathVariable int id) throws ResourceNotFoundException {
-        return filmServiceImpl.getMpaRatingById(id);
+    public MPA getRatingById(@PathVariable Integer id) {
+        return filmServiceImpl.getRatingById(id);
     }
+
+
 }

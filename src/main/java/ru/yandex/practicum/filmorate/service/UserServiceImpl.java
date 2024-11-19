@@ -20,53 +20,46 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void addFriend(Integer userId, Integer friendId) {
-        User user = userStorage.getAllUsers().get(userId);
-        User friend = userStorage.getAllUsers().get(friendId);
-        if (user == null || friend == null) {
-            throw new ResourceNotFoundException("Пользователь(и) не найден(ы)");
-        }
-        switch (userStorage.checkFriendship(userId, friendId)) {
-            case 1:
-                throw new ValidationException("Вы уже отправили заявку/добавили в друзья");
-            case 2:
-                userStorage.updateFriendship(friendId, userId);
-                break;
-            case 3:
-                throw new ValidationException("Вы уже добавили в друзья");
-            case 0:
-                userStorage.createFriendship(userId, friendId);
-                break;
-        }
+        User user = userStorage.getUserById(userId);
+        Map<Integer, Boolean> userFriends = user.getFriendshipMap();
+
+        userFriends.put(friendId, true);
+        user.setFriendshipMap(userFriends);
+        userStorage.updateUser(user);
     }
 
     @Override
     public void removeFriend(Integer userId, Integer friendId) {
-        User user = userStorage.getAllUsers().get(userId);
-        User friend = userStorage.getAllUsers().get(friendId);
+        User user = userStorage.getUserById(userId);
+        User friend = userStorage.getUserById(friendId);
         if (user == null || friend == null) {
             throw new ResourceNotFoundException("Пользователь(и) не найден");
         }
         if (userStorage.checkFriendshipStatus(userId, friendId)) {
             throw new ValidationException("Дружба не существует");
         }
-        userStorage.deleteFriendship(userId, friendId);
+        Map<Integer, Boolean> userFriends = user.getFriendshipMap();
+        userFriends.remove(friendId);
+        user.setFriendshipMap(userFriends);
+        userStorage.updateUser(user);
     }
 
     @Override
     public List<User> getMutualFriends(Integer userId, Integer friendId) {
-        List<User> mutualFriends = new ArrayList<>();
-        User user = userStorage.getAllUsers().get(userId);
-        User friend = userStorage.getAllUsers().get(friendId);
-        if (user == null || friend == null) {
-            throw new ResourceNotFoundException("Пользователь(и) не найден");
+        // Получаем списки друзей пользователей
+        Set<User> userFriends = userStorage.getUserFriends(userId);
+        Set<User> friendFriends = userStorage.getUserFriends(friendId);
+        if (Objects.nonNull(userFriends) && Objects.nonNull(friendFriends)) {
+            // Ищем общих друзей
+            List<User> mutualFriends = new ArrayList<>();
+            for (User user : userFriends) {
+                if (friendFriends.contains(user)) {
+                    mutualFriends.add(user);
+                }
+            }
+            return mutualFriends;
         }
-        for (Integer mutualfriendId : user.getFriendshipMap().keySet()) {
-            if (friend.getFriendshipMap().containsKey(mutualfriendId) &&
-                    (friend.getFriendshipMap().get(mutualfriendId) == Friendship.ACCEPTED) &&
-                    user.getFriendshipMap().get(mutualfriendId) == Friendship.ACCEPTED)
-                mutualFriends.add(getUserById(mutualfriendId));
-        }
-        return mutualFriends;
+        return new ArrayList<>();
     }
 
     @Override

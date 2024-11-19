@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ru.yandex.practicum.filmorate.myenum.Friendship;
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -15,11 +14,10 @@ import java.util.Map;
 
 @Getter
 @Setter
-@ToString
 public class User {
     private int id;
 
-    private Map<Integer, Friendship> friendshipMap = new HashMap<>();
+    private Map<Integer, Boolean> friendshipMap = new HashMap<>();
 
     @NotNull(message = "Email не может быть пустым")
     @Email(message = "Некорректный формат email")

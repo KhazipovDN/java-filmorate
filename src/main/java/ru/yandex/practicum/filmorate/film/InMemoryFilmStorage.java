@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.film;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +38,31 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film getFilmsById(Integer filmId) {
         return films.get(filmId);
+    }
+
+    @Override
+    public void deleteFilm(Film film) {
+
+    }
+
+    @Override
+    public List<Genre> getAllGenres() {
+        return List.of();
+    }
+
+    @Override
+    public Genre getGenreById(Integer id) {
+        return null;
+    }
+
+    @Override
+    public List<MPA> getAllRatings() {
+        return List.of();
+    }
+
+    @Override
+    public MPA getRatingById(Integer id) {
+        return null;
     }
 
     @Override
