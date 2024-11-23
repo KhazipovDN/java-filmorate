@@ -17,4 +17,12 @@ public interface UserStorage {
     User getUserById(Integer id);
 
     Set<User> getUserFriends(Integer id);
+
+    Boolean checkFriendshipStatus(Integer userId, Integer friendId);
+
+    void delete(User user);
+
+    void updateFriends(Integer userId, Integer friendId);
+
+    void removeFriend(Integer userId, Integer friendId);
 }

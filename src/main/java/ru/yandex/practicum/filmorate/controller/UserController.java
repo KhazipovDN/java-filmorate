@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,44 +18,42 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/users")
 public class UserController {
 
     @Autowired
     private UserServiceImpl userServiceImpl;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
-
-    @GetMapping("/{id}")
+    @GetMapping("/users/{id}")
     public User getUser(@PathVariable Integer id) {
         return userServiceImpl.getUserById(id);
     }
 
-    @PutMapping("/{id}/friends/{friendId}")
+    @PutMapping("/users/{id}/friends/{friendId}")
     public ResponseEntity<Void> addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
         userServiceImpl.addFriend(id, friendId);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/{id}/friends/{friendId}")
+    @DeleteMapping("/users/{id}/friends/{friendId}")
     public ResponseEntity<Void> removeFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
         userServiceImpl.removeFriend(id, friendId);
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}/friends")
+    @GetMapping("/users/{id}/friends")
     public Set<User> getFriends(@PathVariable Integer id) {
         if (userServiceImpl.getUserById(id) == null)
             throw new ResourceNotFoundException("Пользователь не найден");
         return userServiceImpl.getUserFriends(id);
     }
 
-    @GetMapping("/{id}/friends/common/{otherId}")
+    @GetMapping("/users/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
         return userServiceImpl.getMutualFriends(id, otherId);
     }
 
-    @PostMapping
+    @PostMapping("/users")
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws ValidationException {
         log.info("Создание нового пользователя", user);
         userServiceImpl.createUser(user);
@@ -62,10 +61,10 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping("/users")
     public ResponseEntity<User> updateUser(@Valid @RequestBody User updatedUser) throws ValidationException {
         if (userServiceImpl.findById(updatedUser)) {
-            log.info("Обновление нового пользователя", updatedUser);
+            log.info("Обновление пользователя", updatedUser);
             userServiceImpl.updateUser(updatedUser);
             log.info("Пользователь создан", updatedUser);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);
@@ -74,7 +73,7 @@ public class UserController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/users")
     public List<User> getAllUsers() {
         return new ArrayList<>(userServiceImpl.getAllUsers().values());
     }

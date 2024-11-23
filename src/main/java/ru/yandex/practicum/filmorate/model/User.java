@@ -6,18 +6,20 @@ import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
-import ru.yandex.practicum.filmorate.myenum.Friendship;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Getter
 @Setter
+@ToString
 public class User {
     private int id;
 
-    private Map<Integer, Friendship> friendshipMap = new HashMap<>();
+    private Map<Integer, Boolean> friendshipMap = new HashMap<>();
 
     @NotNull(message = "Email не может быть пустым")
     @Email(message = "Некорректный формат email")
@@ -32,5 +34,18 @@ public class User {
     @NotNull(message = "Дата рождения обязательна")
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
 }

@@ -1,8 +1,11 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.film.FilmStorage;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.myException.ValidationException;
 import ru.yandex.practicum.filmorate.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -16,8 +19,10 @@ import java.util.*;
 public class FilmServiceImpl implements FilmService {
 
     @Autowired
+    @Qualifier("filmDbStorage")
     private FilmStorage filmStorage;
     @Autowired
+    @Qualifier("userDbStorage")
     private UserStorage userStorage;
 
 
@@ -28,10 +33,13 @@ public class FilmServiceImpl implements FilmService {
         if (film == null || user == null) {
             throw new ResourceNotFoundException("Фильм или пользователь не найден");
         }
-        if (film.getLiked().contains(userId)) {
+        if (film.getLikes().contains(userId)) {
             throw new ValidationException("Пользователь уже поставил лайк этому фильму");
         } else {
-            film.getLiked().add(userId);
+            Set<Integer> likes = film.getLikes();
+            likes.add(userId);
+            film.setLikes(likes);
+            filmStorage.updateFilm(film);
         }
     }
 
@@ -42,8 +50,11 @@ public class FilmServiceImpl implements FilmService {
         if (film == null || user == null) {
             throw new ResourceNotFoundException("Фильм или пользователь не найден");
         }
-        if (film.getLiked().contains(userId)) {
-            film.getLiked().remove(userId);
+        if (film.getLikes().contains(userId)) {
+            Set<Integer> likes = film.getLikes();
+            likes.remove(userId);
+            film.setLikes(likes);
+            filmStorage.updateFilm(film);
         } else {
             throw new ValidationException("Пользователь не ставил лайк этому фильму");
         }
@@ -52,9 +63,8 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getTopFilms(Integer count) {
         List<Film> allFilms = new ArrayList<>(filmStorage.getAllFilms().values());
-        System.out.println(allFilms.isEmpty());
         if (!allFilms.isEmpty()) {
-            allFilms.sort(Comparator.comparingInt(film -> -film.getLiked().size()));
+            allFilms.sort(Comparator.comparingInt(film -> -film.getLikes().size()));
             if (count == null) {
                 count = 10;
             }
@@ -66,6 +76,22 @@ public class FilmServiceImpl implements FilmService {
         } else {
             return Collections.emptyList();
         }
+    }
+
+    public List<Genre> getAllGenres() {
+        return filmStorage.getAllGenres();
+    }
+
+    public Genre getGenreById(Integer id) {
+        return filmStorage.getGenreById(id);
+    }
+
+    public List<MPA> getAllRatings() {
+        return filmStorage.getAllRatings();
+    }
+
+    public MPA getRatingById(Integer id) {
+        return filmStorage.getRatingById(id);
     }
 
     @Override
@@ -95,5 +121,6 @@ public class FilmServiceImpl implements FilmService {
             return filmStorage.findById(film);
 
     }
+
 
 }
