@@ -32,7 +32,7 @@ public class FilmDbStorage implements FilmStorage {
         Integer count = jdbcTemplate.queryForObject(countColomn, Integer.class);
         if (count == null)
             throw new ResourceNotFoundException("Ошибка подключения");
-        return count+1;
+        return count + 1;
     }
 
     @Override
