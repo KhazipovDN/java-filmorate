@@ -26,7 +26,6 @@ public class FilmController {
     private FilmServiceImpl filmServiceImpl;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
 
-    //
     @GetMapping("/films/{id}")
     public Film getFilm(@PathVariable Integer id) throws ResourceNotFoundException {
         return filmServiceImpl.getFilmById(id);

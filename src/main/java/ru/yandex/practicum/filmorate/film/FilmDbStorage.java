@@ -11,8 +11,8 @@ import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.myException.ValidationException;
 import ru.yandex.practicum.filmorate.user.UserDbStorage;
-import java.time.LocalDate;
 import java.util.*;
 
 @Component
@@ -37,12 +37,15 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public void createFilm(Film film) {
-        String countColomn = "SELECT COUNT(*) FROM FILM";
-        id = countColomn(countColomn);
-        String create = "INSERT INTO FILM (FILM_ID, FIlM_NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_ID) VALUES (?, ?, ?, ?, ?, ?)";
-        jdbcTemplate.update(create, id, film.getName(), film.getDescription(), java.sql.Date.valueOf(film.getReleaseDate()), film.getDuration(), film.getMpa().getId());
-        insertFilmGenre(id, getGenreIdList(film.getGenres()));
-        log.info("Создан фильм с идентефикатором {}", id);
+        if (checkMPA(film.getMpa().getId())) {
+            String countColomn = "SELECT COUNT(*) FROM FILM";
+            id = countColomn(countColomn);
+            film.setId(id);
+            String create = "INSERT INTO FILM (FILM_ID, FIlM_NAME, DESCRIPTION, RELEASE_DATE, DURATION, RATING_ID) VALUES (?, ?, ?, ?, ?, ?)";
+            jdbcTemplate.update(create, id, film.getName(), film.getDescription(), java.sql.Date.valueOf(film.getReleaseDate()), film.getDuration(), film.getMpa().getId());
+            insertFilmGenre(id, getGenreIdList(film.getGenres()));
+            log.info("Создан фильм с идентефикатором {}", id);
+        }
     }
 
     @Override
@@ -88,7 +91,13 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film getFilmsById(Integer filmId) {
-        return null;
+        String getFilm = "SELECT * FROM FILM WHERE FILM_ID = ?";
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(getFilm, filmId);
+        if (filmRows.next()) {
+            return makeFilm(filmRows);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -174,6 +183,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setLikes(getLikes(film.getId()));
         film.setGenres(getGenres(film.getId()));
         MPA mpa = getRatingById(rs.getInt("RATING_ID"));
+        film.setMpa(mpa);
         return film;
     }
 
@@ -192,6 +202,8 @@ public class FilmDbStorage implements FilmStorage {
     private void insertFilmGenre(Integer filmId, Set<Integer> genreIdList) {
         String sqlQuery = "INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?)";
         for (Integer id : genreIdList) {
+            if (id > 6)
+                throw new ValidationException("Такого жанра не существует");
             jdbcTemplate.update(sqlQuery, filmId, id);
         }
     }
@@ -228,5 +240,9 @@ public class FilmDbStorage implements FilmStorage {
         return genreIdList;
     }
 
-
+    private Boolean checkMPA(Integer count) {
+        if (count > 5)
+            throw new ValidationException("Такого рейтинга не существует");
+        return true;
+    }
 }

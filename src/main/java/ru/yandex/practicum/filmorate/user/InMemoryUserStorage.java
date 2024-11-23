@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.user;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
-import ru.yandex.practicum.filmorate.myenum.Friendship;
 
 import java.util.*;
 
@@ -71,6 +70,15 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void delete(User user) {
+
+    }
+
+    @Override
+    public void updateFriends(Integer userId, Integer friendId) {
+    }
+
+    @Override
+    public void removeFriend(Integer userId, Integer friendId) {
 
     }
 }

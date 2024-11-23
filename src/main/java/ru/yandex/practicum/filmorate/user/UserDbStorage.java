@@ -4,13 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 
-import java.time.LocalDate;
 import java.util.*;
 
 
@@ -26,12 +26,21 @@ public class UserDbStorage implements UserStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    private Integer countColomn(String countColomn) {
+        Integer count = jdbcTemplate.queryForObject(countColomn, Integer.class);
+        if (count == null)
+            throw new ResourceNotFoundException("Ошибка подключения");
+        return count + 1;
+    }
 
     @Override
     public void createUser(User user) {
         user.setName(checkAndReturnName(user));
-        String create = "INSERT INTO USERS (EMAIL, LOGIN, NAME, BIRTHDAY) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(create, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
+        String countColomn = "SELECT COUNT(*) FROM USERS";
+        id = countColomn(countColomn);
+        user.setId(id);
+        String create = "INSERT INTO USERS (USER_ID, EMAIL, LOGIN, NAME, BIRTHDAY) VALUES (?, ?, ?, ?, ?)";
+        jdbcTemplate.update(create, id, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday());
         log.info("Создан пользователь с идентефикатором {}", id);
     }
 
@@ -41,7 +50,6 @@ public class UserDbStorage implements UserStorage {
         if (userRS.next()) {
             String update = "UPDATE USERS set EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? where USER_ID = ?";
             jdbcTemplate.update(update, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
-            updateFriends(user);
             log.info("Изменён пользователь с идентефикатором {}", user.getId());
         } else throw new ResourceNotFoundException("Нет пользователя с таким id");
     }
@@ -89,8 +97,9 @@ public class UserDbStorage implements UserStorage {
     @Override
     public Set<User> getUserFriends(Integer id) {
         Set<User> users = new HashSet<>();
-        String getUserFriendsQuery = "SELECT u.* FROM USERS u JOIN FRIENDS f ON (u.ID = f.FRIEND_1 AND f.FRIEND_2 = ?)"+
-                "OR (u.ID = f.FRIEND_2 AND f.FRIEND_1 = ?) WHERE f.CONFIRMATION = TRUE" ;
+        String getUserFriendsQuery = "SELECT u.* FROM USERS u JOIN FRIENDS f ON ("+
+                "(u.USER_ID = f.FRIEND_2 AND f.FRIEND_1 = ?) OR"+
+                "(u.USER_ID = f.FRIEND_1 AND f.FRIEND_2 = ? AND f.CONFIRMATION = TRUE))";
         SqlRowSet friends = jdbcTemplate.queryForRowSet(getUserFriendsQuery, id, id);
         while (friends.next()) {
             User user = makeUser(friends);
@@ -102,7 +111,9 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public Boolean checkFriendshipStatus(Integer userId, Integer friendId) {
-        return null;
+        String query = "SELECT COUNT(*) FROM FRIENDS WHERE FRIEND_1 = ? AND FRIEND_2 = ?";
+        Integer count = jdbcTemplate.queryForObject(query, Integer.class, userId, friendId);
+        return count != null && count > 0;
     }
 
     private User makeUser(SqlRowSet rs) {
@@ -116,11 +127,24 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
-    private void updateFriends(User user) {
-        deleteFromFriends(user);
-        String sqlQuery = "INSERT INTO FRIENDS (FRIEND_1, FRIEND_2, CONFIRMATION) VALUES (?, ?, ?)";
-        for (Map.Entry<Integer, Boolean> entry : user.getFriendshipMap().entrySet()) {
-            jdbcTemplate.update(sqlQuery, user.getId(), entry.getKey(), entry.getValue());
+    public void updateFriends(Integer userId, Integer friendId) {
+        String check1 = "SELECT COUNT(*) FROM FRIENDS WHERE (FRIEND_1 = ? AND FRIEND_2 = ?) ";
+        Integer count1 = jdbcTemplate.queryForObject(check1, Integer.class, userId, friendId);
+        if (count1 != null && count1 > 0) {
+            return;
+        }
+        String check2 = "SELECT CONFIRMATION FROM FRIENDS WHERE FRIEND_1 = ? AND FRIEND_2 = ?";
+        Boolean  confirmation = null;
+        try {
+            confirmation = jdbcTemplate.queryForObject(check2, Boolean.class, friendId, userId);
+        } catch (EmptyResultDataAccessException e) {
+        }
+        if (confirmation == null) {
+            String insertQuery = "INSERT INTO FRIENDS (FRIEND_1, FRIEND_2, CONFIRMATION) VALUES (?, ?, ?)";
+            jdbcTemplate.update(insertQuery, userId, friendId, false);
+        } else if (!confirmation) {
+            String update = "UPDATE FRIENDS set CONFIRMATION = ? where FRIEND_1 = ? AND FRIEND_2 = ?";
+            jdbcTemplate.update(update, true, friendId, userId);
         }
     }
 
@@ -145,6 +169,12 @@ public class UserDbStorage implements UserStorage {
         String sqlQuery = "DELETE FROM USERS WHERE USER_ID = ?";
         jdbcTemplate.update(sqlQuery, user.getId());
     }
+
+    public void removeFriend(Integer userId, Integer friendId) {
+        String sqlQuery = "DELETE FROM FRIENDS WHERE (FRIEND_1 = ? AND FRIEND_2 = ?) OR (FRIEND_1 = ? AND FRIEND_2 = ?)";
+        jdbcTemplate.update(sqlQuery, userId, friendId, friendId, userId);
+    }
+
 
     private void deleteFromFriends(User user) {
         String sqlQuery = "DELETE FROM FRIENDS WHERE FRIEND_1 = ? OR FRIEND_2 = ?";

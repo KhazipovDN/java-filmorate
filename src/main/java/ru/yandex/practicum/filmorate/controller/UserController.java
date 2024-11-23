@@ -65,7 +65,6 @@ public class UserController {
     public ResponseEntity<User> updateUser(@Valid @RequestBody User updatedUser) throws ValidationException {
         if (userServiceImpl.findById(updatedUser)) {
             log.info("Обновление пользователя", updatedUser);
-            System.out.println(updatedUser.toString());
             userServiceImpl.updateUser(updatedUser);
             log.info("Пользователь создан", updatedUser);
             return new ResponseEntity<>(updatedUser, HttpStatus.OK);

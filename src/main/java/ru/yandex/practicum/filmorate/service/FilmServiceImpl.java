@@ -63,7 +63,6 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getTopFilms(Integer count) {
         List<Film> allFilms = new ArrayList<>(filmStorage.getAllFilms().values());
-        System.out.println(allFilms.isEmpty());
         if (!allFilms.isEmpty()) {
             allFilms.sort(Comparator.comparingInt(film -> -film.getLikes().size()));
             if (count == null) {

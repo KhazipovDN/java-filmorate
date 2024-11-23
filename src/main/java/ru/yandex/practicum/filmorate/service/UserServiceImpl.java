@@ -3,8 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.myException.ValidationException;
-import ru.yandex.practicum.filmorate.myenum.Friendship;
 import ru.yandex.practicum.filmorate.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
@@ -22,10 +20,18 @@ public class UserServiceImpl implements UserService {
     public void addFriend(Integer userId, Integer friendId) {
         User user = userStorage.getUserById(userId);
         Map<Integer, Boolean> userFriends = user.getFriendshipMap();
-
         userFriends.put(friendId, true);
         user.setFriendshipMap(userFriends);
         userStorage.updateUser(user);
+
+        User friend = userStorage.getUserById(friendId);
+        Map<Integer, Boolean> friendFriends = friend.getFriendshipMap();
+        friendFriends.put(userId, true);
+        friend.setFriendshipMap(friendFriends);
+        userStorage.updateUser(friend);
+
+        userStorage.updateFriends(userId,friendId);
+
     }
 
     @Override
@@ -36,21 +42,25 @@ public class UserServiceImpl implements UserService {
             throw new ResourceNotFoundException("Пользователь(и) не найден");
         }
         if (userStorage.checkFriendshipStatus(userId, friendId)) {
-            throw new ValidationException("Дружба не существует");
+            Map<Integer, Boolean> userFriends = user.getFriendshipMap();
+            userFriends.remove(friendId);
+            user.setFriendshipMap(userFriends);
+            userStorage.removeFriend(userId, friendId);
+
+            Map<Integer, Boolean> friendFriends = friend.getFriendshipMap();
+            if (friendFriends.containsKey(userId)) {
+                friendFriends.remove(userId);
+                friend.setFriendshipMap(friendFriends);
+                userStorage.updateUser(friend);
+            }
         }
-        Map<Integer, Boolean> userFriends = user.getFriendshipMap();
-        userFriends.remove(friendId);
-        user.setFriendshipMap(userFriends);
-        userStorage.updateUser(user);
     }
 
     @Override
     public List<User> getMutualFriends(Integer userId, Integer friendId) {
-        // Получаем списки друзей пользователей
         Set<User> userFriends = userStorage.getUserFriends(userId);
         Set<User> friendFriends = userStorage.getUserFriends(friendId);
         if (Objects.nonNull(userFriends) && Objects.nonNull(friendFriends)) {
-            // Ищем общих друзей
             List<User> mutualFriends = new ArrayList<>();
             for (User user : userFriends) {
                 if (friendFriends.contains(user)) {

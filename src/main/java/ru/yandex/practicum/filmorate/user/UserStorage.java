@@ -21,4 +21,8 @@ public interface UserStorage {
     Boolean checkFriendshipStatus(Integer userId, Integer friendId);
 
     void delete(User user);
+
+    void updateFriends(Integer userId, Integer friendId);
+
+    void removeFriend(Integer userId, Integer friendId);
 }
