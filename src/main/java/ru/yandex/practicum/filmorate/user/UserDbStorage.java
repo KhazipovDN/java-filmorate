@@ -97,8 +97,8 @@ public class UserDbStorage implements UserStorage {
     @Override
     public Set<User> getUserFriends(Integer id) {
         Set<User> users = new HashSet<>();
-        String getUserFriendsQuery = "SELECT u.* FROM USERS u JOIN FRIENDS f ON ("+
-                "(u.USER_ID = f.FRIEND_2 AND f.FRIEND_1 = ?) OR"+
+        String getUserFriendsQuery = "SELECT u.* FROM USERS u JOIN FRIENDS f ON (" +
+                "(u.USER_ID = f.FRIEND_2 AND f.FRIEND_1 = ?) OR" +
                 "(u.USER_ID = f.FRIEND_1 AND f.FRIEND_2 = ? AND f.CONFIRMATION = TRUE))";
         SqlRowSet friends = jdbcTemplate.queryForRowSet(getUserFriendsQuery, id, id);
         while (friends.next()) {
@@ -134,17 +134,17 @@ public class UserDbStorage implements UserStorage {
             return;
         }
         String check2 = "SELECT CONFIRMATION FROM FRIENDS WHERE FRIEND_1 = ? AND FRIEND_2 = ?";
-        Boolean  confirmation = null;
+        Boolean confirmation = null;
         try {
             confirmation = jdbcTemplate.queryForObject(check2, Boolean.class, friendId, userId);
         } catch (EmptyResultDataAccessException e) {
-        }
-        if (confirmation == null) {
-            String insertQuery = "INSERT INTO FRIENDS (FRIEND_1, FRIEND_2, CONFIRMATION) VALUES (?, ?, ?)";
-            jdbcTemplate.update(insertQuery, userId, friendId, false);
-        } else if (!confirmation) {
-            String update = "UPDATE FRIENDS set CONFIRMATION = ? where FRIEND_1 = ? AND FRIEND_2 = ?";
-            jdbcTemplate.update(update, true, friendId, userId);
+            if (confirmation == null) {
+                String insertQuery = "INSERT INTO FRIENDS (FRIEND_1, FRIEND_2, CONFIRMATION) VALUES (?, ?, ?)";
+                jdbcTemplate.update(insertQuery, userId, friendId, false);
+            } else if (!confirmation) {
+                String update = "UPDATE FRIENDS set CONFIRMATION = ? where FRIEND_1 = ? AND FRIEND_2 = ?";
+                jdbcTemplate.update(update, true, friendId, userId);
+            }
         }
     }
 
