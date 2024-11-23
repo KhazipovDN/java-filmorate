@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
                 friend.getFriendshipMap().put(userId, Friendship.ACCEPTED);
             }
         } else {
-            throw new ValidationException("Вы уже отправили заявку/добавили в друзья");
+            throw new ValidationException("Вы уже отправили заявку в друзья");
         }
     }
 
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
         User user = userStorage.getAllUsers().get(userId);
         User friend = userStorage.getAllUsers().get(friendId);
         if (user == null || friend == null) {
-            throw new ResourceNotFoundException("Пользователь(и) не найден");
+            throw new ResourceNotFoundException("Пользователи не найден");
         }
         if (user.getFriendshipMap().containsKey(friendId)) {
             user.getFriendshipMap().remove(friendId);
@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         User user = userStorage.getAllUsers().get(userId);
         User friend = userStorage.getAllUsers().get(friendId);
         if (user == null || friend == null) {
-            throw new ResourceNotFoundException("Пользователь(и) не найден");
+            throw new ResourceNotFoundException("Пользователи не найден");
         }
         for (Integer mutualfriendId : user.getFriendshipMap().keySet()) {
             if (friend.getFriendshipMap().containsKey(mutualfriendId) &&
@@ -69,7 +69,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Integer userId) {
         if (userStorage.getUserById(userId) == null)
-            throw new ResourceNotFoundException("Пользователь не найден");
+            throw new ResourceNotFoundException("Пользователи не найден");
         return userStorage.getUserById(userId);
     }
 
