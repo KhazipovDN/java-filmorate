@@ -11,4 +11,5 @@ public interface UserService {
     List<User> getMutualFriends(Integer userId, Integer friendId);
 
     User getUserById(Integer userId);
+
 }

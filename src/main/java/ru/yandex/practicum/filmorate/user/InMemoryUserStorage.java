@@ -56,9 +56,29 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Set<User> getUserFriends(Integer id) {
         Set<User> friends = new HashSet<>();
-        for (Integer friendId : getUserById(id).getFriends()) {
+        for (Integer friendId : getUserById(id).getFriendshipMap().keySet()) {
+            if (getUserById(id).getFriendshipMap().get(friendId) == true)
             friends.add(getUserById(friendId));
         }
         return friends;
+    }
+
+    @Override
+    public Boolean checkFriendshipStatus(Integer userId, Integer friendId) {
+        return true;
+    }
+
+    @Override
+    public void delete(User user) {
+
+    }
+
+    @Override
+    public void updateFriends(Integer userId, Integer friendId) {
+    }
+
+    @Override
+    public void removeFriend(Integer userId, Integer friendId) {
+
     }
 }
