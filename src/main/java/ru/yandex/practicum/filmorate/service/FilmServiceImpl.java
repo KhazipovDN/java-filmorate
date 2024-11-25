@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.myException.ValidationException;
 import ru.yandex.practicum.filmorate.user.UserStorage;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.myException.InternalServerErrorException;
 import ru.yandex.practicum.filmorate.myException.ResourceNotFoundException;
 
 import java.util.*;
@@ -28,8 +27,8 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void likeFilm(Integer filmId, Integer userId) {
-        Film film = filmStorage.getAllFilms().get(filmId);
-        User user = userStorage.getAllUsers().get(userId);
+        Film film = filmStorage.getFilmsById(filmId);
+        User user = userStorage.getUserById(userId);
         if (film == null || user == null) {
             throw new ResourceNotFoundException("Фильм или пользователь не найден");
         }
@@ -45,8 +44,8 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public void unlikeFilm(Integer filmId, Integer userId) {
-        Film film = filmStorage.getAllFilms().get(filmId);
-        User user = userStorage.getAllUsers().get(userId);
+        Film film = filmStorage.getFilmsById(filmId);
+        User user = userStorage.getUserById(userId);
         if (film == null || user == null) {
             throw new ResourceNotFoundException("Фильм или пользователь не найден");
         }
@@ -96,9 +95,10 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film getFilmById(Integer filmId) {
-        if (getFilmsById(filmId) == null)
-            throw new InternalServerErrorException("Фильм не найден");
-        return getFilmsById(filmId);
+        Film film = getFilmsById(filmId);
+        if (film == null)
+            throw new ResourceNotFoundException("Фильм не найден");
+        return film;
     }
 
     public void createFilm(Film film) {

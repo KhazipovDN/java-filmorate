@@ -74,10 +74,23 @@ public class FilmDbStorage implements FilmStorage {
     public Map<Integer, Film> getAllFilms() {
         Map<Integer, Film> films = new HashMap<>();
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet("SELECT * FROM FILM");
+        Map<Integer, Set<Integer>> likesMap = getTableLikes();
+        Map<Integer, Set<Genre>> genresMap = getTableGenres();
+        Map<Integer, MPA> ratingsMap = getTableRatings();
         while (filmRows.next()) {
-            Film film = makeFilm(filmRows);
-            log.info("Найден фильм: {} {}", film.getId(), film.getName());
+            Film film = new Film();
+            int filmId = filmRows.getInt("FILM_ID");
+            film.setId(filmId);
+            film.setName(filmRows.getString("FILM_NAME"));
+            film.setDescription(filmRows.getString("DESCRIPTION"));
+            film.setReleaseDate(Objects.requireNonNull(filmRows.getDate("RELEASE_DATE")).toLocalDate());
+            film.setDuration(filmRows.getInt("DURATION"));
+
+            film.setLikes(likesMap.getOrDefault(filmId, new HashSet<>()));
+            film.setGenres(new ArrayList<>(genresMap.getOrDefault(filmId, new HashSet<>())));
+            film.setMpa(ratingsMap.get(filmRows.getInt("RATING_ID")));
             films.put(film.getId(), film);
+            log.info("Найден фильм: {} {}", film.getId(), film.getName());
         }
         return films;
     }
@@ -118,7 +131,7 @@ public class FilmDbStorage implements FilmStorage {
         if (genreRows.next()) {
             return makeGenre(genreRows);
         } else
-            throw new ResourceNotFoundException("Не найден жанр с таким номером");
+            throw new ResourceNotFoundException("Не найден жанр с таким номером: " + id);
     }
 
     @Override
@@ -138,7 +151,7 @@ public class FilmDbStorage implements FilmStorage {
         if (ratingRows.next()) {
             return makeMPA(ratingRows);
         } else
-            throw new ResourceNotFoundException("Не найден рейтинг с таким номером");
+            throw new ResourceNotFoundException("Не найден рейтинг с таким номером: " + id);
     }
 
     private void updateFilmUsersLikes(Film film) {
@@ -244,5 +257,49 @@ public class FilmDbStorage implements FilmStorage {
         if (count > 5)
             throw new ValidationException("Такого рейтинга не существует");
         return true;
+    }
+
+    private Map<Integer, Set<Integer>> getTableLikes() {
+        Map<Integer, Set<Integer>> likesMap = new HashMap<>();
+        SqlRowSet likesRows = jdbcTemplate.queryForRowSet("SELECT FILM_ID, USER_ID FROM FILM_USERS_LIKES");
+        while (likesRows.next()) {
+            int filmId = likesRows.getInt("FILM_ID");
+            if (!likesMap.containsKey(filmId)) {
+                likesMap.put(filmId, new HashSet<>());
+            }
+            likesMap.get(filmId).add(likesRows.getInt("USER_ID"));
+        }
+        return likesMap;
+    }
+
+    private Map<Integer, Set<Genre>> getTableGenres() {
+        Map<Integer, Set<Genre>> genresMap = new HashMap<>();
+        SqlRowSet genresRows = jdbcTemplate.queryForRowSet(
+                "SELECT FILM_GENRE.FILM_ID, GENRE.GENRE_ID, GENRE.GENRE_NAME " +
+                        "FROM FILM_GENRE " +
+                        "JOIN GENRE ON FILM_GENRE.GENRE_ID = GENRE.GENRE_ID"
+        );
+        while (genresRows.next()) {
+            int filmId = genresRows.getInt("FILM_ID");
+            genresMap.putIfAbsent(filmId, new HashSet<>());
+            Set<Genre> genres = genresMap.get(filmId);
+            genres.add(new Genre(
+                    genresRows.getInt("GENRE_ID"),
+                    genresRows.getString("GENRE_NAME")
+            ));
+        }
+        return genresMap;
+    }
+
+    private Map<Integer, MPA> getTableRatings() {
+        Map<Integer, MPA> ratingsMap = new HashMap<>();
+        SqlRowSet ratingsRows = jdbcTemplate.queryForRowSet("SELECT RATING_ID, RATING_NAME FROM RATING");
+        while (ratingsRows.next()) {
+            ratingsMap.put(
+                    ratingsRows.getInt("RATING_ID"),
+                    new MPA(ratingsRows.getInt("RATING_ID"), ratingsRows.getString("RATING_NAME"))
+            );
+        }
+        return ratingsMap;
     }
 }

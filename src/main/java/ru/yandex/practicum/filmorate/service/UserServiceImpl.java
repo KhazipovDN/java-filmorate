@@ -38,9 +38,6 @@ public class UserServiceImpl implements UserService {
     public void removeFriend(Integer userId, Integer friendId) {
         User user = userStorage.getUserById(userId);
         User friend = userStorage.getUserById(friendId);
-        if (user == null || friend == null) {
-            throw new ResourceNotFoundException("Пользователь(и) не найден");
-        }
         if (userStorage.checkFriendshipStatus(userId, friendId)) {
             Map<Integer, Boolean> userFriends = user.getFriendshipMap();
             userFriends.remove(friendId);
@@ -74,8 +71,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(Integer userId) {
-        if (userStorage.getUserById(userId) == null)
-            throw new ResourceNotFoundException("Пользователь не найден");
         return userStorage.getUserById(userId);
     }
 
